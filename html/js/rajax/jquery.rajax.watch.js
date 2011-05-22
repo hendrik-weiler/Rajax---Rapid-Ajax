@@ -28,6 +28,11 @@
 			
 			if(eval('events.' + getExecutionName(window.location.hash))) {
 				eval('events.' + getExecutionName(window.location.hash) + '(object)');
+			} else {
+				if(events.onerror)
+				{
+					events.onerror();
+				}
 			}
 			save = window.location.hash;
 		}

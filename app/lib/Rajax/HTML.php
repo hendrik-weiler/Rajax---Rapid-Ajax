@@ -49,7 +49,7 @@ class Rajax_HTML
 	}
 	
 	/**
-	 * Convert zen-php format into rajax
+	 * Convert zen => -php format into rajax
 	 */
 	private function convertOptions()
 	{
@@ -76,5 +76,17 @@ class Rajax_HTML
 		}
 		
 		return preg_replace('#([\w]+)=(\'|\"){(.*)}(\'|\")#i','$1=$3',$return);
+	}
+	
+	public function getTemplate($templatename,$vars)
+	{
+		extract($vars);
+		$templatepath = Rajax_Application::$applicationPath . '/' . Rajax_Application::$templatePath . $templatename . '.phtml';
+
+		if(file_exists($templatepath)) {
+			include $templatepath;
+		} else {
+			return '';
+		}
 	}
 }

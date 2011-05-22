@@ -65,7 +65,7 @@ class Rajax_Controller extends Rajax_Application
 		$resultList = $this->secureTheOutput($resultList,$secureOutput);
 		
 		switch(strtolower(Rajax_Application::$request->output)) 
-		{
+		{	
 			case 'json':
 				header('Content-type: application/json');
 				return new Rajax_JSON($resultList);
@@ -77,8 +77,15 @@ class Rajax_Controller extends Rajax_Application
 				break;
 			case 'html':
 				header('Content-type: text/html');
+				
 				$html = new Rajax_HTML($resultList);
-				return $html->getHTML();
+				
+				if(preg_match('#template=([\w]+)#i',Rajax_Application::$request->options,$matches)) {
+					return $html->getTemplate($matches[1],$resultList);
+				} else {
+					return $html->getHTML();
+				}
+				
 				break;
 		}
 	}

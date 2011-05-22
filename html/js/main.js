@@ -7,9 +7,17 @@ $(function(){
 	$().watch({
 		onload : function() {
 			$('#content').hide().fadeIn(1000);
+			$.bg = $('#content').css('backgroundColor');
 		},
 		onchange : function() {
-			$('#content').html('');
+			$('#content').html('').css('backgroundColor',$.bg);
+		},
+		onerror : function() {
+			$.get('./request/error/html/template=error',function(data) {
+				$('#content').html(data).slideDown('fast').animate({
+					'backgroundColor' : 'red'
+				},2000);
+			});
 		},
 		home : function(e) {
 			$.get('./request/content_getArticles/html/article>hgroup>h3>$title<<p>$text',function(data) {
@@ -45,6 +53,12 @@ $(function(){
 			$.get('./request/content_getPictures/html/article>hgroup>h3>$title<h6>$text<<img[src=$picture]',function(data) {
 				$('#content').html(data.replace('\r','<br />'));
 			});
+		},
+		repo : function() {
+			window.location.href = 'https://github.com/diddlside/Rajax---Rapid-Ajax';
+		},
+		imprint : function() {
+			window.location.href = 'http://dev.rpg-stars.de/impressum/';
 		}
 	},'home');
 	//---------------------------

@@ -47,7 +47,7 @@ class Rajax_Application
 	 * 
 	 * @var string
 	 */
-	static $templatePath = '../app/templates/';
+	static $templatePath = '../../app/templates/';
 	
 	/**
 	 * Contains path to the cache folder
