@@ -7,10 +7,12 @@ $(function(){
 	$().watch({
 		onload : function() {
 			$('#content').hide().fadeIn(1000);
-			$.bg = $('#content').css('backgroundColor');
+			this.bg = $('#content').css('backgroundColor');
 		},
 		onchange : function() {
-			$('#content').html('').css('backgroundColor',$.bg);
+			$('#content').html('').animate({
+				'backgroundColor' : this.bg
+			},1000);
 		},
 		onerror : function() {
 			$.get('./request/error/html/template=error',function(data) {

@@ -6,8 +6,7 @@
 	var check = window.setInterval(detectChange,100);
 
 	if(window.location.hash == '') {
-		var object = $('a[href*="#!/' + start + '"]');
-		eval('events.' + start + '(object)');
+		window.location.href += '#!/' + start;
 	}
 	
 	if(events.onload)
