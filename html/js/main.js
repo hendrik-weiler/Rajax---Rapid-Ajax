@@ -52,7 +52,7 @@ $(function(){
 			});
 		},
 		pictures : function(e) {
-			$.get('./request/content_getPictures/html/article>hgroup>h3>$title<h6>$text<<img[src=$picture]',function(data) {
+			$.get('./request/content_getPictures/html/template=pictures|' + e.parameter,function(data) {
 				$('#content').html(data.replace('\r','<br />'));
 			});
 		},

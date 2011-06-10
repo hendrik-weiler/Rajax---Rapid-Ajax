@@ -31,6 +31,7 @@ class content extends Rajax_Controller
 	
 	public function getPictures()
 	{
+		print_r($this->fparams);
 		print $this->output($this->db->fetchAll('SELECT * FROM pictures'),array(
 			'title','picture','text'
 		));

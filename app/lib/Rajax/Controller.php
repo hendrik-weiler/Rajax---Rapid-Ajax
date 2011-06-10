@@ -37,12 +37,20 @@ class Rajax_Controller extends Rajax_Application
 	public $db;
 	
 	/**
+	 * Contains an array of frontend content pointers
+	 * 
+	 * @var array
+	 */
+	public $fparams = array();
+	
+	/**
 	 * Setup the class
 	 */
 	public function __construct() 
 	{
 		parent::__construct();
 		$this->db = $this->getDb();
+		$this->fparams = $this->getFrontendParams();
 	}
 	
 	/**
@@ -81,7 +89,18 @@ class Rajax_Controller extends Rajax_Application
 				$html = new Rajax_HTML($resultList);
 				
 				if(preg_match('#template=([\w]+)#i',Rajax_Application::$request->options,$matches)) {
-					return $html->getTemplate($matches[1],$resultList);
+
+					if(is_array($resultList) && !empty($resultList))
+					{
+						foreach($resultList as $result)
+						{
+							$html->getTemplate($matches[1],$result);
+						}
+					}
+					else
+					{
+						return $html->getTemplate($matches[1],$resultList);
+					}
 				} else {
 					return $html->getHTML();
 				}
@@ -111,5 +130,19 @@ class Rajax_Controller extends Rajax_Application
 			}
 		}
 		return $return;
+	}
+	
+	/**
+	 * Get the content pointers from frontend to an array
+	 * @return array
+	 */
+	private function getFrontendParams()
+	{
+		$uri = explode('|', urldecode($_SERVER['REQUEST_URI']));
+		
+		if(count($uri) == 2)
+		{
+			return explode('/',$uri[1]);
+		}
 	}
 }
