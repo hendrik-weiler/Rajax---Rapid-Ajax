@@ -17,7 +17,7 @@
  *
  */
 (function($) {
-	$.fn.watch = function(events,start) {
+	$.rajaxWatch = function(events,start) {
 	
 	var save;	
 	
@@ -43,9 +43,11 @@
 			
 			var object = $('a[href*="' + window.location.hash + '"]');
 			object.parameter = window.location.hash.replace('#!/','');
-			
-			if(eval('events.' + getExecutionName(window.location.hash))) {
-				eval('events.' + getExecutionName(window.location.hash) + '(object)');
+
+			if(events[getExecutionName(window.location.hash)]) {
+				events[getExecutionName(window.location.hash)](object);
+			//if(eval('events.' + getExecutionName(window.location.hash))) {
+			//	eval('events.' + getExecutionName(window.location.hash) + '(object)');
 			} else {
 				if(events.onerror)
 				{

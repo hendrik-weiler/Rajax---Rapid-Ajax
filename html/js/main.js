@@ -4,7 +4,7 @@ $(function(){
 	//---------------------------
 	
 	//Rajax Gen - Events
-	$().watch({
+	$.rajaxWatch({
 		onload : function() {
 			$('#content').hide().fadeIn(1000);
 			this.bg = $('#content').css('backgroundColor');
@@ -52,7 +52,7 @@ $(function(){
 			});
 		},
 		pictures : function(e) {
-			$.get('./request/content_getPictures/html/template=pictures|' + e.parameter,function(data) {
+			$.rGet('content_getPictures/html/template=pictures',e,function(data) {
 				$('#content').html(data.replace('\r','<br />'));
 			});
 		},
