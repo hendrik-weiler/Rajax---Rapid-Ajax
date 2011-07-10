@@ -34,7 +34,7 @@ class Rajax_JSON
 	 * 
 	 * @var string
 	 */
-	public $data;
+	private $data;
 	
 	/**
 	 * Setup the class

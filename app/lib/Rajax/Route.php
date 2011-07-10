@@ -34,7 +34,7 @@ class Rajax_Route
 	 * Contains an error message
 	 * @var string
 	 */
-	static $errorMessage;
+	static $errorMessage = 'The data you requested could not be found.';
 	
 	/**
 	 * Checks for valid classes and functions
@@ -43,8 +43,14 @@ class Rajax_Route
 	 */
 	static function Route()
 	{
-		$controller_parts = explode('_',Rajax_Application::$request->controller);
-	
+		if(!isset(Rajax_Application::$request->options) && Rajax_Application::$request->output == 'html') 
+			return false;
+			
+		if(isset(Rajax_Application::$request->controller))
+			$controller_parts = explode('_',Rajax_Application::$request->controller);
+		else
+			$controller_parts[0] = ' DoenstExist ';	
+			
 		if(!class_exists($controller_parts[0],false)) {
 			self::$errorMessage = 'Class: ' 
 									. $controller_parts[0] 

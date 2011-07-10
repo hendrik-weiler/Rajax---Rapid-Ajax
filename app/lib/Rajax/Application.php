@@ -29,7 +29,13 @@
  */
 class Rajax_Application
 {
-	
+
+	/**
+	 * Contains the current rajax versions number
+	 * @var int
+	 */
+	static $version  = 0.05;
+		
 	/**
 	 * Contains the configuration from config.ini
 	 * @var array
@@ -79,9 +85,16 @@ class Rajax_Application
 		self::$applicationPath = realpath('.');
 		
 		self::$request = new stdClass;
-		self::$request->controller = $_GET['controller'];
-		self::$request->output = $_GET['output'];
-		self::$request->options = $_GET['options'];
+		if(!empty($_GET['controller'])) 
+			self::$request->controller = $_GET['controller'];
+		
+		if(!empty($_GET['output']))
+			self::$request->output = strtolower($_GET['output']);
+		
+		if(!empty($_GET['options']))
+			self::$request->options = $_GET['options'];
+		else
+			self::$request->options = '';
 	}
 	
 	/**
@@ -109,20 +122,22 @@ class Rajax_Application
 	 */
 	public function getDb()
 	{
-		self::$config = parse_ini_file(self::$applicationPath . '/../../app/config.ini');
+		self::$config = parse_ini_file(self::$applicationPath . '/../../app/config.ini',true);
 		
 		$db = new Zend_Db_Adapter_Pdo_Mysql(array(
-		    'host'     => self::$config['host'],
-		    'username' => self::$config['username'],
-		    'password' => self::$config['password'],
-		    'dbname'   => self::$config['dbname']
+		    'host'     => self::$config['mysql']['host'],
+		    'username' => self::$config['mysql']['username'],
+		    'password' => self::$config['mysql']['password'],
+		    'dbname'   => self::$config['mysql']['dbname']
 		));
-		
+
 		return $db;
 	}
 	
 	/**
 	 * Starting rajax
+	 * 
+	 * @return void
 	 */
 	public function start()
 	{
@@ -132,10 +147,40 @@ class Rajax_Application
 		}
 		if(!Rajax_Route::Route())
 		{
-			print json_encode(array(
-				'status' => 404, 'message' => Rajax_Route::$errorMessage
-			));
+			print Rajax_Application::error404();
 			exit;
+		}
+	}
+	
+	/**
+	 * Sending error message 404
+	 * 
+	 * @return void
+	 */
+	static function error404()
+	{
+
+		if(!isset(self::$request->output))
+			return '<h1>404</h1><p>' . Rajax_Route::$errorMessage . '</p>';
+
+		switch(strtolower(self::$request->output))
+		{
+			case 'html':
+				return '<h1>404</h1><p>' . Rajax_Route::$errorMessage . '</p>';
+			break;
+			case 'json':
+				return json_encode(array(
+					'status' => 404, 'message' => Rajax_Route::$errorMessage
+				));
+			break;
+			case 'xml':
+				$output = new Rajax_XML(array(
+					0 => array(
+						'status'=>404, 
+						'message' => Rajax_Route::$errorMessage
+				)));
+				return $output->getXML();
+			break;
 		}
 	}
 }

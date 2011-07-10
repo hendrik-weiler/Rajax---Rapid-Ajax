@@ -19,6 +19,7 @@
 	/* Loads non-zend optimized stuff */
 	require_once '../../app/lib/Class_Auto_Load.php';
 	new Class_Auto_Load('../../app/lib/ZenPHP');
+	new Class_Auto_Load('../../app/modul/');
 	new Class_Auto_Load('../../app/controller/');
 	
 	/* Setup and Start Rajax */

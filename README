@@ -1,9 +1,15 @@
 Rajax - Rapid Ajax
 ------------------------
 
-Version 0.02
+Version 0.05
 
 Rajax is a system build for fast ajax developing.
 Its possible doing animation-like sites as in flash.
 
-Example: http://test.rpg-stars.de/developing/webdesign/noname/html/
+Currently supports:
+- wordpress db
+
+Documentation:
+http://doc.rajax.rpg-stars.de/
+
+Example(v. 0.02): http://test.rpg-stars.de/developing/webdesign/noname/html/

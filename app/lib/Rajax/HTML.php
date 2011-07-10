@@ -54,8 +54,9 @@ class Rajax_HTML
 	private function convertOptions()
 	{
 		$options = Rajax_Application::$request->options;
+		$options = explode('|',$options);
 		
-		return preg_replace('#\$([\w]+)>?#i','{%$1%}',$options);
+		return preg_replace('#\$([\w]+)>?#i','{%$1%}',$options[0]);	
 	}
 	
 	/**
@@ -78,9 +79,20 @@ class Rajax_HTML
 		return preg_replace('#([\w]+)=(\'|\"){(.*)}(\'|\")#i','$1=$3',$return);
 	}
 	
+	/**
+	 * Includes a template
+	 * 
+	 * @param string $templatename
+	 * @param array $vars
+	 * @return void
+	 */
 	public function getTemplate($templatename,$vars)
 	{
 		extract($vars);
+		
+		// Templates within multiple directories
+		$templatename = str_replace('_','/',$templatename);
+		
 		$templatepath = Rajax_Application::$applicationPath . '/' . Rajax_Application::$templatePath . $templatename . '.phtml';
 
 		if(file_exists($templatepath)) {

@@ -43,6 +43,14 @@ class Rajax_Controller extends Rajax_Application
 	 */
 	public $fparams = array();
 	
+	
+	/**
+	 * Contains all options from url
+	 * 
+	 * @var array
+	 */
+	public $options = array();
+	
 	/**
 	 * Setup the class
 	 */
@@ -50,63 +58,47 @@ class Rajax_Controller extends Rajax_Application
 	{
 		parent::__construct();
 		$this->db = $this->getDb();
-		$this->fparams = $this->getFrontendParams();
+		$this->fparams = $this->_getFrontendParams();
+		$this->options = $this->_getOptions();
 	}
 	
 	/**
-	 * Output the gathered data from db
-	 * given format outputs = xml,json,html
+	 * Returns all option from url in an array
 	 * 
-	 * $secureOutput = array('username','registereddate')
-	 * With secure output you control which column is able to output within this request
-	 * 
-	 * @param array/object $resultList
-	 * @param string $format
-	 * @param array $secureOutput
-	 * @return html/xml/json
+	 * @return array
 	 */
-	public function output($resultList,$secureOutput = array())
+	private function _getOptions()
 	{
-		if(!is_array($resultList) && !is_object($resultList))
-			throw new Exception('Output expects an object/array as resultList');
-			
-		$resultList = $this->secureTheOutput($resultList,$secureOutput);
+		$return = array();
 		
-		switch(strtolower(Rajax_Application::$request->output)) 
-		{	
-			case 'json':
-				header('Content-type: application/json');
-				return new Rajax_JSON($resultList);
-				break;
-			case 'xml':
-				header('Content-type: text/xml');
-				$xml = new Rajax_XML($resultList);
-				return $xml->getXML();
-				break;
-			case 'html':
-				header('Content-type: text/html');
+		if(Rajax_Application::$request->options)
+		{
+			$options = explode(':',Rajax_Application::$request->options);
+			
+			$return['_type'] = $options[0];	
+			
+			$options = explode(';',$options[1]);
+			
+			foreach($options as $option)
+			{
+				preg_match_all('#([\w]+)=([\w]+)#i',$option,$matches);
 				
-				$html = new Rajax_HTML($resultList);
-				
-				if(preg_match('#template=([\w]+)#i',Rajax_Application::$request->options,$matches)) {
-
-					if(is_array($resultList) && !empty($resultList))
-					{
-						foreach($resultList as $result)
-						{
-							$html->getTemplate($matches[1],$result);
-						}
-					}
-					else
-					{
-						return $html->getTemplate($matches[1],$resultList);
-					}
-				} else {
-					return $html->getHTML();
-				}
-				
-				break;
+				if(!empty($matches[0]))
+					$return[$matches[1][0]] = $matches[2][0];
+			}
 		}
+		
+		return $return;	
+	}
+	
+	
+	private function _isSingleRow($data)
+	{
+		$data = implode('',array_keys($data));
+
+		preg_match_all('#(\d+)#i',$data,$result);
+
+		return (empty($result[0])) ? true : false;
 	}
 	
 	/**
@@ -116,9 +108,12 @@ class Rajax_Controller extends Rajax_Application
 	 * @param array $list
 	 * @return array
 	 */
-	private function secureTheOutput($resultList,array $list)
+	private function _secureTheOutput($resultList,array $list)
 	{
 		$return = array();
+		
+		if(empty($list))
+			return false;
 		
 		foreach($resultList as $count => $obj)
 		{
@@ -136,13 +131,116 @@ class Rajax_Controller extends Rajax_Application
 	 * Get the content pointers from frontend to an array
 	 * @return array
 	 */
-	private function getFrontendParams()
+	private function _getFrontendParams()
 	{
 		$uri = explode('|', urldecode($_SERVER['REQUEST_URI']));
-		
+
 		if(count($uri) == 2)
 		{
 			return explode('/',$uri[1]);
 		}
+	}
+	
+	/**
+	 * Detects charset from query data
+	 * 
+	 * @return string
+	 */
+	private function _convertUTF8($data)
+	{
+		foreach($data as $datakey => $entry)
+		{
+			foreach($entry as $entryKey => $value)
+			{
+				if(mb_detect_encoding($value, 'ISO-8859-1', true))
+					$data[$datakey][$entryKey] = utf8_encode($value);		
+			}
+		}
+		
+		return $data;
+	}
+	
+/**
+	 * Output the gathered data from db
+	 * given format outputs = xml,json,html
+	 * 
+	 * $secureOutput = array('username','registereddate')
+	 * With secure output you control which column is able to output within this request
+	 * 
+	 * @param array/object $resultList
+	 * @param string $format
+	 * @param array $secureOutput
+	 * @return html/xml/json
+	 */
+	public function output($resultList,$secureOutput = array())
+	{
+		if(!$resultList || empty(Rajax_Application::$request->options) && Rajax_Application::$request->output == 'html')
+			return false;
+		
+		if(!is_array($resultList) && !is_object($resultList))
+			throw new Exception('Output expects an object/array as resultList');
+		
+		//$resultList = $this->_secureTheOutput($resultList,$secureOutput);
+		
+		if($this->_isSingleRow($resultList)) 
+		{
+			$data = $resultList;
+			unset($resultList);
+			$resultList[0] = $data;
+		}
+
+		$resultList = $this->_convertUTF8($resultList);
+
+		switch(strtolower(Rajax_Application::$request->output)) 
+		{	
+			case 'json':
+				header('Content-type: application/json');
+				print new Rajax_JSON($resultList);
+				break;
+			case 'xml':
+				header('Content-type: text/xml');
+				$xml = new Rajax_XML($resultList);
+				print $xml->getXML();
+				break;
+			case 'html':
+				header('Content-type: text/html');
+
+				$html = new Rajax_HTML($resultList);
+				
+				if($this->options['_type'] == 'template' && isset($this->options['file'])) {
+
+					if(is_array($resultList) && !empty($resultList))
+					{
+						foreach($resultList as $result)
+						{
+							$html->getTemplate($this->options['file'],$result);
+						}
+					}
+				} else if($this->options['_type'] == 'template' && isset($this->options['odd']) && isset($this->options['even'])) {
+					$count = 1;
+					if(is_array($resultList) && !empty($resultList))
+					{
+						foreach($resultList as $result)
+						{
+							if($count == 1)
+							{
+								$html->getTemplate($this->options['odd'],$result);
+								$count = 2;
+							}
+							else
+							{
+								$html->getTemplate($this->options['even'],$result);
+								$count = 1;
+							}	
+						}
+					}
+						
+				} else {
+					print $html->getHTML();
+				}
+				
+				break;
+		}
+		return true;
 	}
 }

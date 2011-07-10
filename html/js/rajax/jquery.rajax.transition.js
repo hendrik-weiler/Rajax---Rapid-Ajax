@@ -16,26 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-(function($) {
-	$.fn.rajaxNavi = function(options) {
-		
-		var settings = {
-			bashFormat : '#!/'
-		};
-		
-		return this.each(function() {
-			
-			if(options) {
-				$.extend(settings,options);
+/**
+ * Rajax_Controller - Rapid Ajax Controller Class
+ * 
+ * Controlls ajax output
+ * 
+ * @package Rajax
+ * @author Hendrik Weiler
+ * @since 0.05
+ */
+(function($){
+	$.fn.rTrans = function(type,evt){
+		return this.each(function(key,self) {
+			switch(type)
+			{
+				case 1:
+				break;
+				case 2:
+				switch(evt)
+				{
+					case 'error':
+						// none
+					break;
+					case 'change':
+						if(!isAnimated())
+							$(self).fadeOut(1000);
+					break;
+					case 'load':
+						if(!isAnimated())
+							$(self).hide().fadeIn(1000);
+					break;
+					case 'success':
+						if(!isAnimated())
+							$(self).hide().fadeIn(1000);
+					break;
+				}	
+				break;
 			}
 			
-			if(!$(this).is('a'))
-				return false;
-			
-			var href = $(this).attr('href');
-			
-			if(!/http:\/\/(.*).[a-museum]/.test(href))
-				$(this).attr('href',settings.bashFormat + href.replace(' ','_'));
+			function isAnimated()
+			{
+				return $(self).is(':animated');
+			}
 		});
 	}
-})(jQuery);
+})(jQuery);	
