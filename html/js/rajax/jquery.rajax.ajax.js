@@ -16,15 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/**
- * Rajax_Controller - Rapid Ajax Controller Class
- * 
- * Controlls ajax output
- * 
- * @package Rajax
- * @author Hendrik Weiler
- * @since 0.05
- */
 (function($){
 	
 	var Preloader = $('<img alt="Preloader" src="' + RLoad.PreloaderSrc + '" />');

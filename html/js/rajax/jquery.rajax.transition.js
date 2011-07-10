@@ -16,15 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/**
- * Rajax_Controller - Rapid Ajax Controller Class
- * 
- * Controlls ajax output
- * 
- * @package Rajax
- * @author Hendrik Weiler
- * @since 0.05
- */
 (function($){
 	$.fn.rTrans = function(type,evt){
 		return this.each(function(key,self) {
