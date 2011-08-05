@@ -18,7 +18,6 @@
  */
 RLoad.LoadCount = 0;
 
-RLoad.Scripts.push('js/rajax/jquery.rajax.watch.js');
 RLoad.Scripts.push('js/rajax/jquery.rajax.navi.js');
 RLoad.Scripts.push('js/rajax/jquery.rajax.ajax.js');
 RLoad.Scripts.push('js/rajax/jquery.rajax.transition.js');

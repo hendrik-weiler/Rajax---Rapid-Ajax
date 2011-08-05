@@ -17,7 +17,24 @@
  *
  */
 (function($) {
+	$.rajaxEvents = {};
+	
 	$.fn.rajaxNavi = function(options) {
+		
+		var hashLink = window.location.hash.replace('#!/','');
+		var object = $('a[href*="' + window.location.hash + '"]');
+		
+		if(window.location.hash == '' && $.rajaxEvents['onload']) {
+			$.rajaxEvents['onload']();
+		} else if($.rajaxEvents[hashLink.replace('/','_')]) {
+			$.rajaxEvents[hashLink.replace('/','_')]();
+		} else if($.rajaxEvents['onchange']) {
+			object.parameter = hashLink;
+			object.aParameter = object.parameter.split('/');
+			$.rajaxEvents['onchange'](object);
+		} else {
+			$.rajaxEvents['onerror']();
+		}
 		
 		var settings = {
 			bashFormat : '#!/'
@@ -34,8 +51,26 @@
 			
 			var href = $(this).attr('href');
 			
-			if(!/http:\/\/(.*).[a-museum]/.test(href))
+			if(!/(http|https):\/\/(.*).[a-museum]/.test(href)) {
 				$(this).attr('href',settings.bashFormat + href.replace(' ','_'));
+				$(this).click(function() {
+					$.rajaxCall(this);
+				});
+			}
 		});
 	}
+	
+	$.rajaxCall = function(evt) 
+	{
+		evt.parameter = $(evt).attr('href').split('#!/')[1];
+		evt.aParameter = evt.parameter.split('/');
+		
+		if($.rajaxEvents[evt.parameter.replace('/','_')])
+			$.rajaxEvents[evt.parameter.replace('/','_')](evt);
+		else if ($.rajaxEvents['onchange'])
+			$.rajaxEvents['onchange'](evt);
+		else
+			$.rajaxEvents['onerror']();
+		
+	};
 })(jQuery);
