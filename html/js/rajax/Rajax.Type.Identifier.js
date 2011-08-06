@@ -15,3 +15,8 @@ var Event = {
 	Load : 'load',
 	Success : 'success'
 }
+
+var Wordpress = {
+	TemplateComments : 4,
+	TemplatePosts : 5
+}

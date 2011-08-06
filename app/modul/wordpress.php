@@ -105,6 +105,20 @@ class wordpress extends Rajax_Controller
 	}
 	
 	/**
+	 * Get all approved comments to the post/page
+	 * @return mixed
+	 */
+	private function _getComments($post_id)
+	{
+		$query = "SELECT * FROM `" . $this->_tableSuffix 
+				. "comments` WHERE `comment_approved` LIKE '1' AND `comment_post_ID` =" . $post_id;
+				  
+		$result = $this->db->fetchAll($query);
+		
+		return $result;
+	}
+	
+	/**
 	 * Excludes a entry of an category
 	 * 
 	 * @return array
@@ -138,6 +152,32 @@ class wordpress extends Rajax_Controller
 	}
 	
 	/**
+	 * Contains the function for showing comments or not
+	 * @return void
+	 */
+	private function _tmplComments($id,$result)
+	{
+		if($this->options['_type'] == 'comments' 
+			&& isset($this->options['tmpl_page'])
+			&& isset($this->options['tmpl_comment']))
+		{
+			$html = new Rajax_HTML('');
+			$html->getTemplate($this->options['tmpl_page'],$result[$id]);
+			
+			$comments = $this->_getComments($result[$id]['ID']);
+			
+			if(!empty($comments))
+			{
+				foreach($comments as $comment)
+				{
+					$html->getTemplate($this->options['tmpl_comment'],$comment);
+				}
+				return true;
+			}
+		}
+	}
+	
+	/**
 	 * Generates a sql string for getting pages in a category
 	 * 
 	 * @return string
@@ -165,6 +205,59 @@ class wordpress extends Rajax_Controller
 		return str_replace(',)',')',$getPostQuery);
 	}
 	
+	private function _getSubPagesRecursive($page)
+	{
+		if(!preg_match('#^_[\w]+#i',$page['post_title']))
+		{
+			$html = new Rajax_HTML('');
+			
+			$subPageQuery = "SELECT * FROM " . $this->_tableSuffix . "posts WHERE post_parent =" . $page ['ID'] . " AND post_type LIKE 'page' AND post_title NOT LIKE '" . $page['post_title'] . "' AND post_status LIKE 'publish'";
+			
+			$subpageQueryResult = $this->db->fetchAll($subPageQuery);
+	
+			if(is_array($subpageQueryResult))
+			{
+				print '<ul>';
+				
+				foreach($subpageQueryResult as $subPage)
+				{
+					if(!preg_match('#^_[\w]+#i',$subPage['post_title']))
+					{
+						$subPage = $this->_checkNavForLink($subPage);
+						
+						print '<li>';
+						
+						$html->getTemplate($this->options['file'], $subPage);
+						$this->_getSubPagesRecursive($subPage);
+						
+						print '</li>';
+					}
+				}
+				
+				print '</ul>';
+			}
+		}
+	}
+	
+	/**
+	 * Checks if the subpage does linking to somewhere or not
+	 * @param array $subPage
+	 * @return array
+	 */
+	private function _checkNavForLink($subPage)
+	{
+		// Check if page == extern link (from getCategories function)
+		$query = "SELECT *  FROM `" . $this->_tableSuffix . "links` WHERE `link_name` LIKE '" . $subPage['post_title'] . "'";
+		$sql = $this->db->fetchRow($query);
+		if(is_array($sql)) 
+		{
+			if(strtolower($sql['link_name']) == strtolower($subPage['post_title']))
+			{
+				$subPage['slug'] = $sql['link_url'];
+			}
+		}
+		return $subPage;
+	}
 	
 	/**
 	 * Get all categories from wordpress db
@@ -236,58 +329,29 @@ class wordpress extends Rajax_Controller
 			
 			if($this->options['_type'] == 'wp' && $this->options['get'] == 'subpages')
 			{
-				$subPagesHtml = '';
+				$query = "SELECT * FROM `" . $this->_tableSuffix . "posts` 
+						  WHERE `post_type` LIKE 'page' AND post_status LIKE 'publish' AND post_parent =0";
+						  
+				$result = $this->db->fetchAll($query);
 				
 				$subPagesSubList = array();
 				
+				$html = new Rajax_HTML('');
+				
 				foreach($result as $page)
 				{
-					// Check if page == extern link (from getCategories function)
-					$query = "SELECT *  FROM `" . $this->_tableSuffix . "links` WHERE `link_name` LIKE '" . $page['post_title'] . "'";
-					$sql = $this->db->fetchRow($query);
-					if(is_array($sql)) 
-					{
-						if(strtolower($sql['link_name']) == strtolower($page['post_title']))
-						{
-							$page['slug'] = $sql['link_url'];
-						}
-					}
-					////
-					if(!preg_match('#^_[\w]+#i',$page['post_title']))
-					{
-						$subPageQuery = "SELECT * FROM " . $this->_tableSuffix . "posts WHERE post_parent =" . $page ['ID'] . " AND post_type LIKE 'page' AND post_title NOT LIKE '" . $page['post_title'] . "' AND post_status LIKE 'publish'";
-	
-						$href = (isset($page['slug'])) ? $page['slug'] : 'page/' . $page['post_title']; 
-	
-						$subpageQueryResult = $this->db->fetchAll($subPageQuery);
-						if(!in_array($page['post_title'],$subPagesSubList))
-						{
-							$subPagesHtml .= '<li>';
-							
-							$subPagesHtml .= '<a href="' . $href . '">'  . $page['post_title'] . '</a>';
-		
-							if(count($subpageQueryResult != 0))
-							{
-								$subPagesHtml .= '<ul>';
-								
-								foreach($subpageQueryResult as $subPage)
-								{
-									if(!preg_match('#^_[\w]+#i',$page['post_title']))
-									{
-										$subPagesHtml .= '<li><a href="' . $href . '">'  . $subPage['post_title'] . '</a></li>';
-										$subPagesSubList[] = $subPage['post_title'];
-									}
-								}
-								
-								$subPagesHtml .= '</ul>';
-							}
-							
-							$subPagesHtml .= '</li>';
-						}
-					}
+					$page['slug'] = (isset($page['slug'])) ? $page['slug'] : 'page/' . $page['post_title']; 
+					
+					print '<li>';
+					
+					$html->getTemplate($this->options['file'], $page);
+					
+					$page = $this->_checkNavForLink($page);
+
+					$this->_getSubPagesRecursive($page);
+					
+					print '</li>';
 				}
-				
-				print str_replace('<ul></ul>','',$subPagesHtml);
 				return;
 			}
 			
@@ -326,13 +390,26 @@ class wordpress extends Rajax_Controller
 	{
 		$name =$this->fparams[1];
 
+		if(!in_array($this->fparams[0],array('page','post')))
+			print Rajax_Application::error404();
+
 		$query = "SELECT * FROM `" . $this->_tableSuffix . "posts` 
-				  WHERE `post_type` LIKE 'page' AND post_title LIKE '" . $name . "'";
+				  WHERE `post_type` LIKE '" . $this->fparams[0] . "' AND post_title LIKE '" . $name . "'";
 				  
 		$result = $this->db->fetchAll($query);
 
+		$html = new Rajax_HTML('');
+		
 		if(count($result) != 0) 
 		{
+			
+			if($this->_tmplComments(0,$result)) {
+				if($result[0]['comment_status'] == 'open')
+					$html->getTemplate($this->options['tmpl_form'], $result[0]);
+				return;
+			}
+				
+			
 			if(!$this->output($result))
 			{
 				$this->_showCustomError($this->_noSiteFound);
@@ -400,6 +477,60 @@ class wordpress extends Rajax_Controller
 			print Rajax_Application::error404();
 		}
 
+	}
+
+	/**
+	 * Adds a comment in db
+	 * @return void
+	 */
+	public function addComment()
+	{
+		if (preg_match('/([\w]+){4,}/',$_POST['comment_author'])
+			&& preg_match('/[\w]+@[\w]+\.[\w]+/',$_POST['comment_author_email'])) 	
+		{
+			extract($_POST);
+			
+			$query = "INSERT INTO  `" . $this->_tableSuffix . "comments` (
+				`comment_post_ID` ,
+				`comment_author` ,
+				`comment_author_email` ,
+				`comment_author_url` ,
+				`comment_author_IP` ,
+				`comment_date` ,
+				`comment_date_gmt` ,
+				`comment_content` ,
+				`comment_karma` ,
+				`comment_approved` ,
+				`comment_agent` ,
+				`comment_type` ,
+				`comment_parent` ,
+				`user_id`
+				)
+				VALUES (
+				:post_id ,  :comment_author ,  :comment_author_email ,  :comment_author_url ,  
+						:ip ,  '" . date('Y-m-d H:i:s',time()) . "',  '" . date('Y-m-d H:i:s',time()) . "',  :comment_content ,  '0',  '0',  '',  '',  '0',  '0'
+				)";
+			
+			$this->_params = array(
+			            ':post_id' => $comment_post_ID,
+			            ':comment_author' => $comment_author,
+			            ':comment_author_email' => $comment_author_email,
+			            ':comment_author_url' => $comment_author_url,
+			            ':ip' => $_SERVER['REMOTE_ADDR'],
+			            ':comment_content' => $comment_content
+			);
+			
+			$this->_query = $this->db->prepare($query);
+		    $this->_query->execute($this->_params);
+					
+			$this->db->lastInsertId();
+			
+			print 'true';
+		}
+		else
+		{
+			print 'false';
+		}
 	}
 
 	/**

@@ -66,6 +66,7 @@
 			
 			switch(type)
 			{
+				// PUT IDS
 				case 1:
 					$(value).rGet(url + '/html/template:file=' + params.file + siteParam, (params.success) ? params.success : putData);
 				break;
@@ -74,6 +75,18 @@
 				break;
 				case 3:
 					$(value).rGet(url + '/json/' + siteParam, putJSONData);
+				break;
+				// WORDPRESS IDS
+				case 4:
+					$(value).rGet(url + '/html/comments:tmpl_page=' + params.tmpl_page + ';tmpl_comment=' + params.tmpl_comment + ';tmpl_form=' + params.tmpl_form + ';' + siteParam, putData);
+				break;
+				case 5:
+					$(value).rGet(url + '/html/template:file=' + params.file + siteParam, function(data) {
+					  $(value).html(data);
+					  $(params.linkSelector).rajaxNavi({
+					  	disableAutoload : true
+					  });
+					});
 				break;
 			}
 			function putData(data) {

@@ -21,30 +21,35 @@
 	
 	$.fn.rajaxNavi = function(options) {
 		
-		var hashLink = window.location.hash.replace('#!/','');
-		var object = $('a[href*="' + window.location.hash + '"]');
-		
-		if(window.location.hash == '' && $.rajaxEvents['onload']) {
-			$.rajaxEvents['onload']();
-		} else if($.rajaxEvents[hashLink.replace('/','_')]) {
-			$.rajaxEvents[hashLink.replace('/','_')]();
-		} else if($.rajaxEvents['onchange']) {
-			object.parameter = hashLink;
-			object.aParameter = object.parameter.split('/');
-			$.rajaxEvents['onchange'](object);
-		} else {
-			$.rajaxEvents['onerror']();
-		}
-		
 		var settings = {
-			bashFormat : '#!/'
+			bashFormat : '#!/',
+			disableAutoload : false
 		};
 		
-		return this.each(function() {
-			
-			if(options) {
-				$.extend(settings,options);
+		if(!options)
+			options = {};
+		
+		$.extend(settings,options);
+		
+		var hashLink = window.location.hash.replace('#!/','');
+		var object = $('a[href*="' + window.location.hash + '"]');
+
+		if(!options.disableAutoload)
+		{
+			if(window.location.hash == '' && $.rajaxEvents['onload']) {
+				$.rajaxEvents['onload']();
+			} else if($.rajaxEvents[hashLink.replace('/','_')]) {
+				$.rajaxEvents[hashLink.replace('/','_')]();
+			} else if($.rajaxEvents['onchange']) {
+				object.parameter = hashLink;
+				object.aParameter = object.parameter.split('/');
+				$.rajaxEvents['onchange'](object);
+			} else {
+				$.rajaxEvents['onerror']();
 			}
+		}
+		
+		return this.each(function() {
 			
 			if(!$(this).is('a'))
 				return false;
@@ -53,7 +58,7 @@
 			
 			if(!/(http|https):\/\/(.*).[a-museum]/.test(href)) {
 				$(this).attr('href',settings.bashFormat + href.replace(' ','_'));
-				$(this).click(function() {
+				$(this).bind('click',function() {
 					$.rajaxCall(this);
 				});
 			}
