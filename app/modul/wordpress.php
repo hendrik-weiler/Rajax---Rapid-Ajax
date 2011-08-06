@@ -79,6 +79,13 @@ class wordpress extends Rajax_Controller
 	 */
 	private $_noSiteFound = 'The site you requested doenst exist.';
 	
+	
+	/**
+	 * Define if comments needs apporval or not
+	 * @var bool
+	 */
+	public $commentsNeedApproval = true;
+	
 	/**
 	 * Checks if the category has posts
 	 * 
@@ -490,6 +497,8 @@ class wordpress extends Rajax_Controller
 		{
 			extract($_POST);
 			
+			$approval = ($this->commentsNeedApproval) ? 0 : 1;
+			
 			$query = "INSERT INTO  `" . $this->_tableSuffix . "comments` (
 				`comment_post_ID` ,
 				`comment_author` ,
@@ -508,7 +517,7 @@ class wordpress extends Rajax_Controller
 				)
 				VALUES (
 				:post_id ,  :comment_author ,  :comment_author_email ,  :comment_author_url ,  
-						:ip ,  '" . date('Y-m-d H:i:s',time()) . "',  '" . date('Y-m-d H:i:s',time()) . "',  :comment_content ,  '0',  '0',  '',  '',  '0',  '0'
+						:ip ,  '" . date('Y-m-d H:i:s',time()) . "',  '" . date('Y-m-d H:i:s',time()) . "',  :comment_content ,  '0',  '" . $approval . "',  '',  '',  '0',  '0'
 				)";
 			
 			$this->_params = array(
@@ -525,7 +534,7 @@ class wordpress extends Rajax_Controller
 					
 			$this->db->lastInsertId();
 			
-			print 'true';
+			print ($this->commentsNeedApproval) ? 'true' : 'reload';
 		}
 		else
 		{

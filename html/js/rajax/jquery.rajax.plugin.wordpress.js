@@ -17,30 +17,31 @@
  *
  */
 (function($) {
-	$.fn.rajaxWordpressAddComment = function(controller,errormessage) {
+	$.fn.rajaxWordpressAddComment = function(controller,errormessage,successmessage) {
 		
 		var preloader = $('<img alt="preloader" src="' + RLoad.PreloaderSrc + '" />').css({
 			position : 'absolute',
-			top: '50%',
-			left: '50%'
+			right: '50%',
+			bottom: '10%'
 		});
 		
-		this.each(function(value) {
+		this.each(function(key,value) {
+
+			var comment_author = /([\w]+){4,}/;
+			var comment_author_email = /[\w]+@[\w]+\.[\w]+/;
 			
-			if (!/([\w]+){4,}/.test($(this).find('input[name=comment_author]').val()))
+			if (!comment_author.test($(this).find('input[name=comment_author]').val())
+				|| !comment_author_email.test($(this).find('input[name=comment_author_email]').val()))
 			{
-				if (!/[\w]+@[\w]+\.[\w]+/.test($(this).find('input[name=comment_author_email]').val()))
-				{
-					$(this).find('input[name=comment_author]').effect("shake", {}, 200);
-					$(this).find('input[name=comment_author_email]').effect("shake", {}, 200);
-					return;
-				}
+				$(this).find('input[name=comment_author]').effect("shake", {}, 200);
+				$(this).find('input[name=comment_author_email]').effect("shake", {}, 200);
+				return;
 			}
 			
 			$.ajax({
 			  url: "./request/" + controller + "_addComment/html/",
 			  beforeSend: function() {
-			  	$(value).appendTo('body');
+			  	$(preloader).appendTo('body');
 			  },
 			  type : 'POST',
 			  data : $(this).serialize(),
@@ -48,14 +49,18 @@
 			  success: function(data){
 			  	
 			  	$(preloader).remove();
-			  	$(value).append(data);
+			  	
 			  	if(data == 'true')
+			  	{
+			  		$('<div id="rajaxCommentSuccess">' + successmessage + '</div>').hide().prependTo(value).fadeIn(1000).delay(1000).fadeOut(1000);
+			  	}
+			  	else if(data == 'reload')
 			  	{
 			  		window.location.reload(true);
 			  	}
 			  	else
 			  	{
-			  		$(value).append('<div id="rajaxCommentError">' + errormessage + '</div>');
+			  		$('<div id="rajaxCommentError">' + errormessage + '</div>').hide().prependTo(value).fadeIn(1000).delay(1000).fadeOut(1000);
 			  	}
 			  }
 			});
