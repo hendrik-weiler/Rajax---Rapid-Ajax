@@ -403,7 +403,7 @@ class wordpress extends Rajax_Controller
 			print Rajax_Application::error404();
 
 		$query = "SELECT * FROM `" . $this->_tableSuffix . "posts` 
-				  WHERE `post_type` LIKE '" . $this->fparams[0] . "' AND post_title LIKE '" . $name . "'";
+				  WHERE `post_type` LIKE '" . $this->fparams[0] . "' AND post_name LIKE '" . $name . "'";
 				  
 		$result = $this->db->fetchAll($query);
 
