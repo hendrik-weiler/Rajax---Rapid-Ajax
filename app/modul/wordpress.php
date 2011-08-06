@@ -178,9 +178,11 @@ class wordpress extends Rajax_Controller
 				foreach($comments as $comment)
 				{
 					$html->getTemplate($this->options['tmpl_comment'],$comment);
-				}
-				return true;
+				}	
 			}
+				if($result[0]['comment_status'] == 'open')
+					$html->getTemplate($this->options['tmpl_form'], $result[0]);
+			return true;
 		}
 	}
 	
@@ -411,8 +413,6 @@ class wordpress extends Rajax_Controller
 		{
 			
 			if($this->_tmplComments(0,$result)) {
-				if($result[0]['comment_status'] == 'open')
-					$html->getTemplate($this->options['tmpl_form'], $result[0]);
 				return;
 			}
 				

@@ -53,6 +53,8 @@
 			  	if(data == 'true')
 			  	{
 			  		$('<div id="rajaxCommentSuccess">' + successmessage + '</div>').hide().prependTo(value).fadeIn(1000).delay(1000).fadeOut(1000);
+			  		$(value).find('input').val('');
+			  		$(value).find('textarea').val('');
 			  	}
 			  	else if(data == 'reload')
 			  	{
