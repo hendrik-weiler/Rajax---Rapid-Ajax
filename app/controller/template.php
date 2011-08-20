@@ -2,9 +2,15 @@
 
 class template extends Rajax_Controller
 {
+	
+	public function __construct()
+	{
+		$this->useDB('seconddb');
+	}
+	
 	public function getTemplateData()
 	{
-		$sql = "SELECT * FROM `db`";
+		$sql = "SELECT * FROM `projekte`";
 		
 		$result = $this->db->fetchAll($sql);
 		
@@ -15,5 +21,10 @@ class template extends Rajax_Controller
 				Rajax_Application::error404();
 			}
 		}
+	}
+	
+	public function error()
+	{
+		Rajax_Application::error404();
 	}
 }

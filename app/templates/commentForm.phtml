@@ -1,0 +1,23 @@
+<form action="#" method="post" accept-charset="utf-8" id="rajaxCommentForm">
+	<div id="attention">
+		Comments must be first approved before they will be shown.
+	</div>
+	<label for="comment_author">Name:*required</label>
+	<input name="comment_author" type="text" />
+	  
+	<label for="comment_author_email">Email:*required</label>
+	<input name="comment_author_email" type="text" />
+	  
+	<label for="comment_author_url">Homepage:</label>
+	<input name="comment_author_url" type="text" />
+	  
+	<textarea name="comment_content" cols="30" rows="10"></textarea>
+	<input name="comment_post_ID" type="hidden" value="<?php print $ID; ?>" />
+	  
+	<input id="rajaxCommentFormButton" type="button" value="Reply" />
+</form><script src="js/rajax/jquery.rajax.module.wordpress.js"></script>
+<script>
+	$('#rajaxCommentFormButton').click(function() {
+		$('#rajaxCommentForm').rajaxWordpressAddComment('dev','You have entered invalid text.','Done! You have now to wait of the approval!');
+	});
+</script>

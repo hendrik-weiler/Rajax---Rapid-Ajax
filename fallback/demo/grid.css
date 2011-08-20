@@ -1,0 +1,65 @@
+html, body, .container {
+	height:auto;
+}
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	background: #e2e2e2;
+	background: -moz-radial-gradient(center, #a1a1a1, #e2e2e2) no-repeat #e2e2e2;
+	background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 500, from(#a1a1a1), to(#e2e2e2)) no-repeat #e2e2e2;
+}
+
+.container {
+	margin-top:40px;
+	padding:10px;
+	background: #fff;
+	box-shadow: 0 0 10px 2px #666;
+}	
+
+header {
+	margin:20px 0 20px 0;
+}
+
+header h1 {
+	float:left;
+	margin:0 30px 0 0;
+}
+
+header blockquote {
+	font-size: 20px;
+	margin: 0;
+	color:#999;
+}
+
+header blockquote:before { content: "\201C"; font-weight: bold; font-size: 30px; }
+header blockquote:after { content: "\201D"; font-weight: bold; font-size: 30px; }
+
+footer {
+
+}
+
+/* iPad Portrait/Browser */
+@media only screen and (min-width: 768px) and (max-width: 991px) {}
+
+/* Mobile/Browser */
+@media only screen and (max-width: 767px) {}
+
+/* Mobile Landscape/Browser */
+@media only screen and (min-width: 480px) and (max-width: 767px) {}
+
+/* Anything smaller than standard 960 */
+@media only screen and (max-width: 959px) {
+	header h1 {
+		float:none;
+		
+	}
+}
+
+/* iPad Portrait Only */
+@media only screen and (min-width: 768px) and (max-width: 991px) and (max-device-width: 1000px) {}
+
+/* Mobile Only */
+@media only screen and (max-width: 767px) and (max-device-width: 1000px) {}
+
+/* Mobile Landscape Only */
+@media only screen and (min-width: 480px) and (max-width: 767px) and (max-device-width: 1000px) {}

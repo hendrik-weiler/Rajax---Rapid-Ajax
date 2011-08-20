@@ -1,0 +1,19 @@
+<article>
+    <h3 class="highlight"><a href="post/<?php print $post_name; ?>"><?php print $post_title; ?></a></h3>
+    <img class="devhr" src="img/hr.png" alt="horizontal rule" />
+    <p class="paddering">
+    	<?php 
+    		$text = str_replace(PHP_EOL,'<br />',strip_tags($post_content));
+			$length = strlen($text);
+			if(($length*0.50) > 200) {
+    			print substr($text, 0, $length*0.5);
+    			print '....'; 
+			} else {
+				print $text;
+			}	
+    	?>
+    </p>
+    <section id="details">
+      Posted on <time><?php print $post_date; ?></time> | <?php print $comment_count; ?> Comments
+    </section>
+</article>

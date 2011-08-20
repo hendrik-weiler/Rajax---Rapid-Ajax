@@ -88,7 +88,8 @@ class Rajax_HTML
 	 */
 	public function getTemplate($templatename,$vars)
 	{
-		extract($vars);
+		if(is_array($vars))
+			extract($vars);
 		
 		// Templates within multiple directories
 		$templatename = str_replace('_','/',$templatename);

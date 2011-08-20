@@ -214,6 +214,28 @@ class wordpress extends Rajax_Controller
 		return str_replace(',)',')',$getPostQuery);
 	}
 	
+	/**
+	 * Checks if the category should be linking external
+	 * @param array $page
+	 * @return array
+	 */
+	private function _checkForNavLink($page)
+	{
+		$sql = "SELECT * FROM  `" . $this->_tableSuffix . "links` WHERE  `link_name` LIKE  '" . $page['post_title'] . "'";
+		
+		$result = $this->db->fetchRow($sql);
+		
+		if(!empty($result))
+			$page['slug'] = $result['link_url'];
+
+		return $page;
+	}
+	
+	/**
+	 * Print the a navigation recursively
+	 * @param object $page
+	 * @return void
+	 */
 	private function _getSubPagesRecursive($page)
 	{
 		if(!preg_match('#^_[\w]+#i',$page['post_title']))
@@ -224,7 +246,7 @@ class wordpress extends Rajax_Controller
 			
 			$subpageQueryResult = $this->db->fetchAll($subPageQuery);
 	
-			if(is_array($subpageQueryResult))
+			if(!empty($subpageQueryResult))
 			{
 				print '<ul>';
 				
@@ -232,11 +254,14 @@ class wordpress extends Rajax_Controller
 				{
 					if(!preg_match('#^_[\w]+#i',$subPage['post_title']))
 					{
-						$subPage = $this->_checkNavForLink($subPage);
+						$subPage['slug'] = (isset($subPage['slug'])) ? $subPage['slug'] : 'page/' . $subPage['post_title']; 
 						
 						print '<li>';
 						
+						$subPage = $this->_checkForNavLink($subPage);
+						
 						$html->getTemplate($this->options['file'], $subPage);
+						
 						$this->_getSubPagesRecursive($subPage);
 						
 						print '</li>';
@@ -246,26 +271,6 @@ class wordpress extends Rajax_Controller
 				print '</ul>';
 			}
 		}
-	}
-	
-	/**
-	 * Checks if the subpage does linking to somewhere or not
-	 * @param array $subPage
-	 * @return array
-	 */
-	private function _checkNavForLink($subPage)
-	{
-		// Check if page == extern link (from getCategories function)
-		$query = "SELECT *  FROM `" . $this->_tableSuffix . "links` WHERE `link_name` LIKE '" . $subPage['post_title'] . "'";
-		$sql = $this->db->fetchRow($query);
-		if(is_array($sql)) 
-		{
-			if(strtolower($sql['link_name']) == strtolower($subPage['post_title']))
-			{
-				$subPage['slug'] = $sql['link_url'];
-			}
-		}
-		return $subPage;
 	}
 	
 	/**
@@ -351,15 +356,20 @@ class wordpress extends Rajax_Controller
 				{
 					$page['slug'] = (isset($page['slug'])) ? $page['slug'] : 'page/' . $page['post_title']; 
 					
-					print '<li>';
+					if(!preg_match('#^_[\w]+#i',$page['post_title']))
+					{
 					
-					$html->getTemplate($this->options['file'], $page);
-					
-					$page = $this->_checkNavForLink($page);
+						print '<li>';
+						
+						$page = $this->_checkForNavLink($page);
 
-					$this->_getSubPagesRecursive($page);
+						$html->getTemplate($this->options['file'], $page);
+	
+						$this->_getSubPagesRecursive($page);
+						
+						print '</li>';
 					
-					print '</li>';
+					}
 				}
 				return;
 			}
@@ -399,12 +409,14 @@ class wordpress extends Rajax_Controller
 	{
 		$name =$this->fparams[1];
 
-		if(!in_array($this->fparams[0],array('page','post')))
+		if(!in_array($this->fparams[0],array('page','post'))) {
 			print Rajax_Application::error404();
+			return;
+		}
 
 		$query = "SELECT * FROM `" . $this->_tableSuffix . "posts` 
-				  WHERE `post_type` LIKE '" . $this->fparams[0] . "' AND post_name LIKE '" . $name . "'";
-				  
+				  WHERE `post_type` LIKE '" . $this->fparams[0] . "' AND post_title LIKE '" . $name . "'";
+			
 		$result = $this->db->fetchAll($query);
 
 		$html = new Rajax_HTML('');
@@ -445,7 +457,7 @@ class wordpress extends Rajax_Controller
 		$result = $this->db->fetchAll($query);
 
 		$siteNumbers = '';
-		
+
 		if(count($result) != 0) 
 		{
 			$getPostQuery = $this->_getPagesSQL($result, $multiplier);

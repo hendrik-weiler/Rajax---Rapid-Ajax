@@ -34,7 +34,7 @@ class Rajax_Application
 	 * Contains the current rajax versions number
 	 * @var int
 	 */
-	static $version  = 0.05;
+	static $version  = 0.10;
 		
 	/**
 	 * Contains the configuration from config.ini
@@ -53,7 +53,7 @@ class Rajax_Application
 	 * 
 	 * @var string
 	 */
-	static $templatePath = '../../app/templates/';
+	static $templatePath = 'app/templates/';
 	
 	/**
 	 * Contains path to the cache folder
@@ -78,20 +78,30 @@ class Rajax_Application
 	static $request;
 	
 	/**
+	 * Tells the application if the fallback is enabled
+	 * @var bool
+	 */
+	static $fallback = false;
+	
+	/**
 	 * Setup the class
 	 */
 	public function __construct() 
 	{
-		self::$applicationPath = realpath('.');
+		$path = './../';
+		while(!realpath($path . 'app'))
+			$path .= '../';
 		
+		self::$applicationPath = realpath($path);
+
 		self::$request = new stdClass;
-		if(!empty($_GET['controller'])) 
+		if(isset($_GET['controller'])) 
 			self::$request->controller = $_GET['controller'];
 		
-		if(!empty($_GET['output']))
+		if(isset($_GET['output']))
 			self::$request->output = strtolower($_GET['output']);
 		
-		if(!empty($_GET['options']))
+		if(isset($_GET['options']))
 			self::$request->options = $_GET['options'];
 		else
 			self::$request->options = '';
@@ -120,15 +130,15 @@ class Rajax_Application
 	 * 
 	 * @return Zend_Db_Adapter_Pdo_Mysql
 	 */
-	public function getDb()
+	public function setDb($databaseKey)
 	{
-		self::$config = parse_ini_file(self::$applicationPath . '/../../app/config.ini',true);
+		self::$config = parse_ini_file(self::$applicationPath . '/app/config.ini',true);
 		
 		$db = new Zend_Db_Adapter_Pdo_Mysql(array(
-		    'host'     => self::$config['mysql']['host'],
-		    'username' => self::$config['mysql']['username'],
-		    'password' => self::$config['mysql']['password'],
-		    'dbname'   => self::$config['mysql']['dbname']
+		    'host'     => self::$config[$databaseKey]['host'],
+		    'username' => self::$config[$databaseKey]['username'],
+		    'password' => self::$config[$databaseKey]['password'],
+		    'dbname'   => self::$config[$databaseKey]['dbname']
 		));
 
 		return $db;
@@ -148,7 +158,6 @@ class Rajax_Application
 		if(!Rajax_Route::Route())
 		{
 			print Rajax_Application::error404();
-			exit;
 		}
 	}
 	
@@ -182,5 +191,24 @@ class Rajax_Application
 				return $output->getXML();
 			break;
 		}
+	}
+	
+	/**
+	 * Adds all js files into content
+	 * (who knows if it will be used someday)
+	 * @param string param1..param2...
+	 * @return void
+	 */
+	static function includeRajax()
+	{
+		print '<script>';
+		
+		foreach(scandir('../../app/js') as $file)
+		{
+			if(in_array($file,array('.','..')))
+				print str_replace(array(' ',PHP_EOL),array('',''),file_get_contents('../../app/js/' . $file));
+		}
+		
+		print '</script>';
 	}
 }

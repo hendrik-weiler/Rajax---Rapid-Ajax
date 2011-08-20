@@ -20,7 +20,7 @@
 	$.rajaxEvents = {};
 	
 	$.fn.rajaxNavi = function(options) {
-		
+
 		var settings = {
 			bashFormat : '#!/',
 			disableAutoload : false
@@ -32,14 +32,22 @@
 		$.extend(settings,options);
 		
 		var hashLink = window.location.hash.replace('#!/','');
-		var object = $('a[href*="' + window.location.hash + '"]');
+		var object = ($('a[href*="' + hashLink + '"]')) 
+					? $('a[href*="' + hashLink.replace(/\_/g,'/')
+					+ '"]').eq(0) : $('a[href*="' + hashLink + '"]').eq(0);
+
+		if(object.length != 0) {
+			object.parameter = $(object).attr('href');
+			object.aParameter = object.parameter.split('/');
+		}
 
 		if(!options.disableAutoload)
 		{
 			if(window.location.hash == '' && $.rajaxEvents['onload']) {
 				$.rajaxEvents['onload']();
-			} else if($.rajaxEvents[hashLink.replace('/','_')]) {
-				$.rajaxEvents[hashLink.replace('/','_')]();
+			} else if(typeof $.rajaxEvents[hashLink.replace(/\//g,'_')] == 'function') {
+				$.rajaxEvents['onchange'](object);
+				$.rajaxEvents[hashLink.replace(/\//g,'_')]();
 			} else if($.rajaxEvents['onchange']) {
 				object.parameter = hashLink;
 				object.aParameter = object.parameter.split('/');
@@ -50,14 +58,14 @@
 		}
 		
 		return this.each(function() {
-			
+
 			if(!$(this).is('a'))
 				return false;
 			
 			var href = $(this).attr('href');
-			
+
 			if(!/(http|https):\/\/(.*).[a-museum]/.test(href)) {
-				$(this).attr('href',settings.bashFormat + href.replace(' ','_'));
+				$(this).attr('href',settings.bashFormat + href.replace(/ /g,'_'));
 				$(this).bind('click',function() {
 					$.rajaxCall(this);
 				});
@@ -70,9 +78,10 @@
 		evt.parameter = $(evt).attr('href').split('#!/')[1];
 		evt.aParameter = evt.parameter.split('/');
 		
-		if($.rajaxEvents[evt.parameter.replace('/','_')])
-			$.rajaxEvents[evt.parameter.replace('/','_')](evt);
-		else if ($.rajaxEvents['onchange'])
+		if($.rajaxEvents[evt.parameter.replace(/\//g,'_')]) {
+			$.rajaxEvents['onchange'](evt);
+			$.rajaxEvents[evt.parameter.replace(/\//g,'_')](evt);
+		} else if ($.rajaxEvents['onchange'])
 			$.rajaxEvents['onchange'](evt);
 		else
 			$.rajaxEvents['onerror']();

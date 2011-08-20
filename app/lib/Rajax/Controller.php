@@ -57,7 +57,7 @@ class Rajax_Controller extends Rajax_Application
 	public function __construct() 
 	{
 		parent::__construct();
-		$this->db = $this->getDb();
+		$this->db = $this->setDb('mysql');
 		$this->fparams = $this->_getFrontendParams();
 		$this->options = $this->_getOptions();
 	}
@@ -71,9 +71,12 @@ class Rajax_Controller extends Rajax_Application
 	{
 		$return = array();
 		
-		if(Rajax_Application::$request->options)
+		if(isset(Rajax_Application::$request->options))
 		{
 			$options = explode(':',Rajax_Application::$request->options);
+			
+			if(!isset($options[1]))
+				return false;
 			
 			$return['_type'] = $options[0];	
 			
@@ -133,7 +136,7 @@ class Rajax_Controller extends Rajax_Application
 	 */
 	private function _getFrontendParams()
 	{
-		$uri = explode('|', urldecode($_SERVER['REQUEST_URI']));
+		$uri = explode('|', urldecode(Rajax_Application::$request->options));
 
 		if(count($uri) == 2)
 		{
@@ -160,7 +163,19 @@ class Rajax_Controller extends Rajax_Application
 		return $data;
 	}
 	
-/**
+	/**
+	 * Setting new database as default
+	 * @param string $key
+	 * @return void
+	 */
+	public function useDB($key)
+	{
+		$this->db = $this->setDb($key);
+		$this->fparams = $this->_getFrontendParams();
+		$this->options = $this->_getOptions();
+	}
+	
+	/**
 	 * Output the gathered data from db
 	 * given format outputs = xml,json,html
 	 * 
@@ -194,16 +209,21 @@ class Rajax_Controller extends Rajax_Application
 		switch(strtolower(Rajax_Application::$request->output)) 
 		{	
 			case 'json':
-				header('Content-type: application/json');
+				if(!Rajax_Application::$fallback)
+					header('Content-type: application/json');
+					
 				print new Rajax_JSON($resultList);
 				break;
 			case 'xml':
-				header('Content-type: text/xml');
+				if(!Rajax_Application::$fallback)
+					header('Content-type: text/xml');
+				
 				$xml = new Rajax_XML($resultList);
 				print $xml->getXML();
 				break;
 			case 'html':
-				header('Content-type: text/html');
+				if(!Rajax_Application::$fallback)
+					header('Content-type: text/html');
 
 				$html = new Rajax_HTML($resultList);
 				

@@ -1,0 +1,164 @@
+body {
+	font-family:Arial;
+	background: #FFFFFF;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFFFFF), to(#FFDB29));
+	background: -webkit-linear-gradient(#FFFFFF, #FFDB29);
+	background: -moz-linear-gradient(#FFFFFF, #FFDB29);
+	background: -ms-linear-gradient(#FFFFFF, #FFDB29);
+	background: -o-linear-gradient(#FFFFFF, #FFDB29);
+	background: linear-gradient(#FFFFFF, #FFDB29);
+	-pie-background: linear-gradient(#FFFFFF, #FFDB29);
+	behavior: url(PIE.php);
+}
+
+#container {
+	width: 960px;
+	margin: auto;
+}
+
+fieldset {
+	border: none;
+}
+
+fieldset legend {
+	font-size: 20px;
+	border-bottom: 1px solid black;
+	padding-bottom: 3px;
+}
+
+input {
+	display: block;
+}
+label {
+	
+}
+select.requestgoal {
+	display:block;
+	width: 160px;
+}
+.rgetoptions,
+.rputoptions,
+.rajaxoptions
+{
+	width: auto;
+	display: inline;
+	margin: 5px;
+}
+
+#request {
+	width: 800px;
+	height: 350px;
+}
+.required fieldset {
+	display: block;
+	width: 400px;
+	float: left;
+}
+.clearfix {
+	height: 0;
+	clear: both;
+}
+
+dt {
+	padding: 15px;
+	display:block;
+	border-bottom: 1px solid black;
+}
+
+#window {
+	padding: 15px;
+	position: absolute;
+	width: 650px;
+	text-align: center;
+	left: 50%;
+	margin-left: -325px;
+	border: 1px solid black;
+	background: #EFB92E;
+	-webkit-box-shadow: #666 0px 2px 3px;
+	-moz-box-shadow: #666 0px 2px 3px;
+	box-shadow: #666 0px 2px 3px;
+	behavior: url(PIE.php);
+}
+
+#window legend {
+	border-bottom: 1px solid black;
+	padding-bottom: 3px;
+	font-size: 24px;
+	display: block;
+}
+
+#output {
+	padding: 10px;
+	border: 1px solid black;
+}
+
+nav {
+	border-bottom: 1px solid black;
+	margin-bottom: 7px;
+}
+
+nav ul {
+	list-style: none;
+}
+
+nav ul a {
+	text-decoration: none;
+	letter-spacing: 3px;
+	padding: 3px;
+	border-radius: 5px;
+	display:block;
+	margin-bottom: 5px;
+	width: auto;
+	color: black;
+}
+
+.active,
+nav ul a:hover {
+	background: #FFDB29;
+	text-decoration: none;
+	letter-spacing: 3px;
+	color: white;
+}
+
+.ui-menu {
+	margin: 0;
+	padding: 0;
+	width:300px;
+	list-style:none;
+	border: 1px solid black;
+	background: #FFFFFF;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFFFFF), to(#FFDB29));
+	background: -webkit-linear-gradient(#FFFFFF, #FFDB29);
+	background: -moz-linear-gradient(#FFFFFF, #FFDB29);
+	background: -ms-linear-gradient(#FFFFFF, #FFDB29);
+	background: -o-linear-gradient(#FFFFFF, #FFDB29);
+	background: linear-gradient(#FFFFFF, #FFDB29);
+	-pie-background: linear-gradient(#FFFFFF, #FFDB29);
+	-webkit-box-shadow: #666 0px 2px 3px;
+	-moz-box-shadow: #666 0px 2px 3px;
+	box-shadow: #666 0px 2px 3px;
+	behavior: url(PIE.php);
+}
+
+.ui-menu-item:hover {
+	background: #FFD21A;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFD21A), to(#FF000C));
+	background: -webkit-linear-gradient(#FFD21A, #FF000C);
+	background: -moz-linear-gradient(#FFD21A, #FF000C);
+	background: -ms-linear-gradient(#FFD21A, #FF000C);
+	background: -o-linear-gradient(#FFD21A, #FF000C);
+	background: linear-gradient(#FFD21A, #FF000C);
+	-pie-background: linear-gradient(#FFD21A, #FF000C);
+}
+
+.ui-menu-item a {
+	display: block;
+	padding: 3px;
+}
+
+#output,
+#request
+{
+	float: left;
+	width: 460px;
+}
