@@ -33,8 +33,8 @@
 		
 		var hashLink = window.location.hash.replace('#!/','');
 		var object = ($('a[href*="' + hashLink + '"]')) 
-					? $('a[href*="' + hashLink.replace(/\_/g,'/').eq(0)
-					+ '"]') : $('a[href*="' + hashLink + '"]').eq(0);
+					? $('a[href*="' + hashLink.replace(/\_/g,'/')
+					+ '"]').eq(0) : $('a[href*="' + hashLink + '"]').eq(0);
 
 		if(object.length != 0) {
 			object.parameter = $(object).attr('href');
