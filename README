@@ -1,12 +1,14 @@
 Rajax - Rapid Ajax
 ------------------------
 
-Version 0.1
+Version 0.11
 
-Rajax is a system build for fast ajax developing.
-Its possible doing animation-like sites as in flash.
+Rajax is a system build for creating ajax based websites. 
+The normal frontend of a wordpress instance will be replaced with a ajax based content viewer. 
+
+In ```app/config.ini``` you can add mysql connections.  
 
 Currently supports:
-* wordpress db
+* wordpress db (partial)
 
 # This project wont be maintained anymore

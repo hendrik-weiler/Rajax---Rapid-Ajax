@@ -5,12 +5,12 @@ class template extends Rajax_Controller
 	
 	public function __construct()
 	{
-		$this->useDB('seconddb');
+		$this->useDB('mysql');
 	}
 	
 	public function getTemplateData()
 	{
-		$sql = "SELECT * FROM `projekte`";
+		$sql = "SELECT * FROM `wp_woocommerce_order_items`";
 		
 		$result = $this->db->fetchAll($sql);
 		

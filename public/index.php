@@ -32,22 +32,22 @@
   <!-- Include fallback -->
   <?php 
   	if(preg_match('#(page|post)#',$_SERVER['REQUEST_URI']))
-		$onchangeContent = 'dev_getPageByName/html/template:file=pages|e.parameter';
+		$onchangeContent = 'wp_getPageByName/html/template:file=pages|e.parameter';
 	else
-		$onchangeContent = 'dev_getPostsByCategory/html/template:file=posts|e.parameter';
+		$onchangeContent = 'wp_getPostsByCategory/html/template:file=posts|e.parameter';
   
   	$events = array(
   		'onload' => array(
-  			'nav' => array('dev_getCategories/html/template:file=category','dev_getPages/html/template:file=categoryPages'),
-  			'#content' => 'dev_getPostsByCategory/html/template:file=posts|notice'
+  			'nav' => array('wp_getCategories/html/template:file=category','wp_getPages/html/template:file=categoryPages'),
+  			'#content' => 'wp_getPostsByCategory/html/template:file=posts|notice'
 		),
 		'onchange' => array(
-			'nav' => array('dev_getCategories/html/template:file=category','dev_getPages/html/template:file=categoryPages'),
+			'nav' => array('wp_getCategories/html/template:file=category','wp_getPages/html/template:file=categoryPages'),
 			'#content' => $onchangeContent
 		),
 		'onerror' => array(
-			'nav' => array('dev_getCategories/html/template:file=category','dev_getPages/html/template:file=categoryPages'),
-			'#content' => 'dev_getPostsByCategory/html/template:file=posts|notice'
+			'nav' => array('wp_getCategories/html/template:file=category','wp_getPages/html/template:file=categoryPages'),
+			'#content' => 'wp_getPostsByCategory/html/template:file=posts|notice'
 		)
 	);
 	

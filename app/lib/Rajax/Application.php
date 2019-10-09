@@ -134,6 +134,11 @@ class Rajax_Application
 	{
 		self::$config = parse_ini_file(self::$applicationPath . '/app/config.ini',true);
 		
+		if(!isset(self::$config[$databaseKey])) {
+			print "Database " . $databaseKey . " does not exist.";
+			exit;
+		}
+
 		$db = new Zend_Db_Adapter_Pdo_Mysql(array(
 		    'host'     => self::$config[$databaseKey]['host'],
 		    'username' => self::$config[$databaseKey]['username'],
